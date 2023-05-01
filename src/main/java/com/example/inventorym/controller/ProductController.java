@@ -3,7 +3,7 @@ package com.example.inventorym.controller;
 import com.example.inventorym.dto.ProductBO;
 import com.example.inventorym.dto.ProductCreateBO;
 import com.example.inventorym.dto.ProductSearchBO;
-import com.example.inventorym.service.impl.ProductService;
+import com.example.inventorym.facade.ProductFacade;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -16,10 +16,11 @@ import java.util.UUID;
 @RequestMapping("/products")
 public class ProductController {
 
-    private final ProductService productService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    private final ProductFacade productFacade;
+
+    public ProductController(ProductFacade productFacade) {
+        this.productFacade = productFacade;
     }
 
     @GetMapping("")
@@ -28,7 +29,7 @@ public class ProductController {
                            Model model, Authentication authentication) {
 
         var sortOrder = dir.equals("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
-        var products = productService.findAllByUser(authentication.getName(), sortOrder);
+        var products = productFacade.findAllByUser(authentication.getName(), sortOrder);
 
         model.addAttribute("newProduct", new ProductCreateBO());
         model.addAttribute("searchProduct", new ProductSearchBO());
@@ -41,20 +42,20 @@ public class ProductController {
     @PostMapping("/")
     public String addProduct(ProductCreateBO productCreateBO, Authentication authentication) {
         productCreateBO.setEmail(authentication.getName());
-        productService.createProduct(productCreateBO);
+        productFacade.createProduct(productCreateBO);
         return "redirect:/products";
     }
 
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable("id") UUID id,
                        Model model) {
-        model.addAttribute("editProduct", productService.findById(id));
+        model.addAttribute("editProduct", productFacade.findById(id));
         return "productEdit";
     }
 
     @PostMapping("/edit")
     public String editSave(ProductBO productBO) {
-        productService.updateProduct(productBO);
+        productFacade.updateProduct(productBO);
         return "redirect:/products";
     }
 
@@ -64,7 +65,7 @@ public class ProductController {
                                 @RequestParam(defaultValue = "desc") String dir,
                                 Model model, Authentication authentication) {
         var sortOrder = dir.equals("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
-        var products = productService.searchProduct(productBO, authentication.getName(), sortOrder);
+        var products = productFacade.searchProduct(productBO, authentication.getName(), sortOrder);
 
         model.addAttribute("newProduct", new ProductCreateBO());
         model.addAttribute("editProduct", new ProductBO());

@@ -1,8 +1,9 @@
 package com.example.inventorym.controller;
 
 import com.example.inventorym.dto.*;
-import com.example.inventorym.service.impl.DocumentService;
-import com.example.inventorym.service.impl.ProductService;
+import com.example.inventorym.facade.DocumentFacade;
+import com.example.inventorym.facade.ProductFacade;
+import com.example.inventorym.facade.impl.DocumentFacadeImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,14 +24,14 @@ import java.util.UUID;
 @RequestMapping("/documents")
 public class DocumentController {
 
-    private final DocumentService documentService;
-    private final ProductService productService;
+    private final DocumentFacade documentFacade;
+    private final ProductFacade productFacade;
     private final TemplateEngine templateEngine;
 
 
-    public DocumentController(DocumentService documentService, ProductService productService, TemplateEngine templateEngine) {
-        this.documentService = documentService;
-        this.productService = productService;
+    public DocumentController(DocumentFacade documentFacade, ProductFacade productFacade, TemplateEngine templateEngine) {
+        this.documentFacade = documentFacade;
+        this.productFacade = productFacade;
         this.templateEngine = templateEngine;
     }
 
@@ -41,8 +42,8 @@ public class DocumentController {
 
         System.out.println(sort + " - " + dir);
         var sortOrder = dir.equals("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
-        var documents = documentService.findAllByUser(authentication.getName(), sortOrder);
-        var products = productService.findAllByUser(authentication.getName(), Sort.by("name").descending());
+        var documents = documentFacade.findAllByUser(authentication.getName(), sortOrder);
+        var products = productFacade.findAllByUser(authentication.getName(), Sort.by("name").descending());
 
         model.addAttribute("docs", documents);
 /*        model.addAttribute("documents", documents);*/
@@ -60,9 +61,8 @@ public class DocumentController {
                                 @RequestParam(defaultValue = "desc") String dir,
                                 Model model, Authentication authentication) {
         var sortOrder = dir.equals("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
-        var documents = documentService.searchDocument(authentication.getName(), sortOrder, documentSearchBO);
-        var products = productService.findAllByUser(authentication.getName(), Sort.by("name").descending());
-
+        var documents = documentFacade.searchDocument(authentication.getName(), sortOrder, documentSearchBO);
+        var products = productFacade.findAllByUser(authentication.getName(), Sort.by("name").descending());
         model.addAttribute("docs", documents);
         /*        model.addAttribute("documents", documents);*/
         model.addAttribute("productsForModal", products);
@@ -74,7 +74,7 @@ public class DocumentController {
 
     @GetMapping("/refusend/{id}")
     public String refusedProduct(@PathVariable("id") UUID id,Model model) {
-        var products = documentService.findProductByDocId(id);
+        var products = documentFacade.findProductByDocId(id);
         model.addAttribute("productsForModal", products);
         model.addAttribute("documentRefusedBO", new DocumentRefusedBO());
         return "documentReturn";
@@ -82,12 +82,12 @@ public class DocumentController {
 
     @PostMapping("/createRefused")
     public String refusedDocument(DocumentRefusedBO documentRefusedBO,Authentication authentication) {
-        documentService.createRefused(documentRefusedBO, authentication.getName());
+        documentFacade.createRefused(documentRefusedBO, authentication.getName());
         return "redirect:/documents";
     }
     @PostMapping("/createReception")
     public String receptionDocument(DocumentReceptionBO documentReceptionBO, Authentication authentication) {
-        documentService.createReception(documentReceptionBO, authentication.getName());
+        documentFacade.createReception(documentReceptionBO, authentication.getName());
         return "redirect:/documents";
     }
 
@@ -95,7 +95,7 @@ public class DocumentController {
     @ResponseBody
     public ResponseEntity<byte[]> exportDoc(@PathVariable("id") UUID id) throws Exception {
 
-        var doc = documentService.findDocByIdForExport(id);
+        var doc = documentFacade.findDocByIdForExport(id);
 
         // Create a Thymeleaf context with any necessary variables
         Context context = new Context();
