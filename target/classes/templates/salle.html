@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<head>
+  <title>Inventory Management System</title>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script
+          src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script
+          src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    $(document).on('change', '#name', function () {
+      var selectedOptionIndex = $(this).find('option:selected').index();
+
+      $('#email option').eq(selectedOptionIndex).prop('selected', true);
+    });
+
+    $(document).on('change', '#email', function () {
+      var selectedOptionIndex = $(this).find('option:selected').index();
+
+      $('#name option').eq(selectedOptionIndex).prop('selected', true);
+    });
+
+    $(document).on('change', '#pname', function () {
+      var selectedOptionIndex = $(this).find('option:selected').index();
+
+      $('#pqty option').eq(selectedOptionIndex).prop('selected', true);
+    });
+
+    $(document).on('change', '#pqty', function () {
+      var selectedOptionIndex = $(this).find('option:selected').index();
+
+      $('#pname option').eq(selectedOptionIndex).prop('selected', true);
+    });
+  </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <a class="navbar-brand" th:href="@{'/'}">Головна</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item"><a class="nav-link"
+                              th:href="@{'/products/list'}">Продукти</a></li>
+      <li class="nav-item"><a class="nav-link"
+                              th:href="@{'/'}">Замовлення</a></li>
+      <li class="nav-item"><a class="nav-link"
+                              th:href="@{'/CRM/list'}">Користувачі</a></li>
+    </ul>
+  </div>
+</nav>
+<!-- Select OrderHeader Number/Date/Type/Status -->
+<form th:action="@{/orderController/saveOrderHeader}" th:object="${formOrderHeader}" method="POST"
+      onsubmit="return confirm('Are you sure you want to save this order header?')">
+  <div class="card-inline">
+    <h5 class="card-header"></h5>
+    <div class="card-body">
+      <input type="hidden" th:field="*{orderHeaderId}"/>
+      <h5 class="card-title"></h5>
+      <p class="card-text">
+
+      <div class="form-group mr-2">
+        <input type="hidden" th:field="*{orderHeaderId}"/>
+        <h5 class="card-title"></h5>
+      </div>
+
+      <div class="form-group mr-2">
+        <label for="name" class="mr-2">Номер замовлення:</label>
+        <input type="text" th:field="*{number}" class="form-control" id="name" readonly>
+      </div>
+
+      <div class="form-group mr-2">
+        <label for="date" class="mr-2">Дата:</label>
+        <input type="date" class="form-control" id="date" th:field="*{orderDate}"
+               th:value="${#temporals.format(currentDate, 'dd.MM.yyyy')}" readonly>
+      </div>
+
+    </div>
+  </div>
+  <!-- Select Customer/Product/ADD TO Cart -->
+  <div class="card-deck mt-4">
+    <div class="card">
+      <div class="card-header text-white bg-primary">
+        <i>Оберіть товар</i>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title ">Товар</h5>
+        <p class="card-text">
+          <label for="pname"></label><select class="form-control form-control-lg" id="pname"
+                                             th:field="*{newOrderLine.product.name}">
+          <option th:each="product : ${productList}"
+                  th:value="${product.name}" th:text="${product.name}">
+        </select>
+        <h5 class="card-title ">Кількість</h5>
+        <label>
+          <input class="form-control form-control-sm" type="text"
+                 th:field="*{newOrderLine.quantity}"/>
+        </label>
+      </div>
+    </div>
+    <div class="card">
+      <button type="submit" value="Submit" class="btn btn-success">Додати до замовлення</button>
+    </div>
+  </div>
+</form>
+<!-- CART -->
+<div class="card">
+  <h5 class="card-header " style="text-align: center; margin-top: 20px;">Замовлення</h5>
+  <div class="card-body">
+    <div class="card-title">
+      <p class="card-text">
+      <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+          <th>Номер замовлення</th>
+          <th>Назва продукту</th>
+          <th>Ціна</th>
+          <th>Кількість</th>
+          <th>Тип</th>
+          <th>Разом</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tempOrderLine : ${formOrderHeader.orderLine}">
+          <td th:text="${tempOrderLine.orderLineId}"/>
+          <td th:text="${tempOrderLine.product.name}"/>
+          <td th:text="${tempOrderLine.product.price}"/>
+          <td>
+            <button type="button" class="btn btn-danger">
+              <i class="fa fa-minus"></i>
+            </button>
+            <a th:text="${tempOrderLine.quantity}"></a>
+            <button type="button" class="btn btn-success">
+              <i class="fa fa-plus"></i>
+            </button>
+          </td>
+          <td><a
+                  th:href="@{'/orderController/delete?orderLineId=' +${tempOrderLine.orderLineId} +'&orderNumber='+ ${formOrderHeader.number} }"
+                  class="btn btn-danger"><i class="fa fa-remove"></i> Прибрати</a></td>
+          <td th:text="${tempOrderLine.total}"/>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+          <td colspan="5" style="text-align: right">Фінальна ціна:</td>
+          <td th:text="${formOrderHeader.finalTotal}"/>
+        </tr>
+        <tr>
+          <td colspan="6" style="text-align: right">
+            <a type="button"
+               class="btn btn-success"
+               th:href="@{'/orderController/checkout?orderNumber='+${formOrderHeader.number} }">
+              Check Out </a>
+            <!-- CHECKOUT MODAL -->
+            <button type="button" data-toggle="modal"
+                    data-target="#checkoutModal" class="btn btn-primary">Зберегти
+            </button>
+            <!-- CHECKOUT MODAL -->
+            <div class="modal fade" id="checkoutModal" role="dialog">
+              <div class="modal-dialog modal-lg">
+                <div align="center" class="modal-content">
+                  <div class="modal-header text-center">
+                    <h4 class="modal-title text-center">Перегляньте своє замовлення</h4>
+                    <button class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                    <table class="table table-bordered table-striped">
+                      <p>
+                        <tr th:each="tempOrderHeader : ${formOrderHeader}">
+                          <td align="center">Order Number</td>
+                          <td align="center" th:text="${tempOrderHeader.number}"/>
+                        </tr>
+                        <tr th:each="tempOrderHeader : ${formOrderHeader}">
+                          <td align="center">Order Type</td>
+                          <td align="center" th:text="${tempOrderHeader.type}"/>
+                        </tr>
+                        <tr th:each="tempOrderHeader : ${formOrderHeader}">
+                          <td align="center">Order Date</td>
+                          <td align="center" th:text="${tempOrderHeader.orderDate}"/>
+                        </tr>
+                        <tr th:each="tempOrderHeader : ${formOrderHeader.customer}">
+                          <td align="center">Customer ID</td>
+                          <td align="center" th:text="${tempOrderHeader.id}"/>
+                        </tr>
+                        <tr
+                                th:each="tempOrderHeader : ${formOrderHeader}">
+                          <td align="center">Total Amount</td>
+                          <td align="center" th:text="${tempOrderHeader.finalTotal}"/>
+                        </tr>
+                    </table>
+                    <h4 align="center">Деталі продажу</h4>
+                    <br/>
+                    <table class="table table-bordered table-striped">
+                      <thead>
+                      <tr>
+                        <th>Номер замовлення</th>
+                        <th>Назва продукту</th>
+                        <th>Ціна</th>
+                        <th>Кількість</th>
+                        <th>Разом</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr th:each="tempOrderLine : ${formOrderHeader.orderLine}">
+                        <td th:text="${tempOrderLine.orderLineId}"/>
+                        <td th:text="${tempOrderLine.product.name}"/>
+                        <td th:text="${tempOrderLine.product.price}"/>
+                        <td th:text="${tempOrderLine.quantity}"></td>
+                        <td th:text="${tempOrderLine.total}"/>
+                      </tr>
+                      </tbody>
+                    </table>
+                    <br/> <br/> <br/>
+                  </div>
+                  <div class="modal-footer">
+                    <button href="#" type="button" data-dismiss="modal"
+                            class="btn btn-md btn-danger">Cancel
+                    </button>
+                    <a class="btn btn-success" th:href="@{'/'}" type="button">Оформити продаж</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<script th:inline="javascript">
+  var currentDate = [[${currentDate}]];
+  document.getElementById("date").value = currentDate;
+</script>
+
+</body>
+</html>

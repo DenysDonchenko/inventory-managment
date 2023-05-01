@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph Example</title>
+    <script th:src="@{/webjars/chartjs/2.9.4/Chart.min.js}"></script>
+</head>
+<body>
+<div style="display: flex;    justify-content: space-around;">
+
+<div style="width: 40%">
+    <canvas id="myChart"></canvas>
+</div>
+
+  <div style="width: 40%">
+    <canvas id="mySell"></canvas>
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var ctx2 = document.getElementById('mySell').getContext('2d');
+
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
+            datasets: [{
+                label: 'Продажа',
+                data: [12, 19, 3, 5, 2, 3, 10, 25, 14, 26, 35, 15],
+
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(143, 66, 132, 0.2)',
+                    'rgba(111, 15, 65, 0.2)',
+                    'rgba(89, 13, 254, 0.2)',
+                    'rgba(22, 195, 80, 0.2)',
+                    'rgba(190, 168, 179, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(143, 66, 132, 1)',
+                    'rgba(111, 15, 65, 1)',
+                    'rgba(89, 13, 254, 1)',
+                    'rgba(22, 195, 80, 1)',
+                    'rgba(190, 168, 179, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    var myChart2 = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
+        datasets: [{
+          label: 'Повернення',
+          data: [12, 19, 3, 5, 2, 3, 10, 25, 14, 26, 35, 15],
+
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(143, 66, 132, 0.2)',
+            'rgba(111, 15, 65, 0.2)',
+            'rgba(89, 13, 254, 0.2)',
+            'rgba(22, 195, 80, 0.2)',
+            'rgba(190, 168, 179, 0.2)',
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(143, 66, 132, 1)',
+            'rgba(111, 15, 65, 1)',
+            'rgba(89, 13, 254, 1)',
+            'rgba(22, 195, 80, 1)',
+            'rgba(190, 168, 179, 1)',
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        }
+      }
+    });
+</script>
+
+</body>
+</html>
